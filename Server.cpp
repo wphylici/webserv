@@ -10,6 +10,11 @@ Server::~Server()
 
 }
 
+void Server::setServerName(std::string ServerName)
+{
+	this->server_name = ServerName;
+}
+
 void Server::setHost(std::string Host)
 {
 	this->host = Host;
@@ -18,6 +23,11 @@ void Server::setHost(std::string Host)
 void Server::setPort(std::string Port)
 {
 	this->port = Port;
+}
+
+void Server::setBodySize(std::string BodySize)
+{
+	this->max_body_size = BodySize;
 }
 
 void Server::setLocPath(std::string LocPath)
@@ -30,6 +40,11 @@ void Server::setFlagLoc(bool FlagLoc)
 	this->flag_loc = FlagLoc;
 }
 
+std::string Server::getServerName(void)
+{
+	return (this->server_name);
+}
+
 std::string Server::getHost(void)
 {
 	return (this->host);
@@ -38,6 +53,11 @@ std::string Server::getHost(void)
 std::string Server::getPort(void)
 {
 	return (this->port);
+}
+
+std::string Server::getBodySize(void)
+{
+	return (this->max_body_size);
 }
 
 bool Server::getFlagLoc(void)

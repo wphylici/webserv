@@ -35,22 +35,28 @@ class Server
 		Server();
 		~Server();
 		// void Server::setMap(std::string loc_name, std::string field, std::string value);
+		void setServerName(std::string ServerName);
 		void setHost(std::string Host);
 		void setPort(std::string Port);
+		void setBodySize(std::string BodySize);
 		void setFlagLoc(bool FlagLoc);
 		void setLocPath(std::string LocPath);
 		void setMap(std::map < std::string, std::map<std::string, std::string> > map);
 		std::map < std::string, std::map<std::string, std::string> > getMap(void);
+		std::string getServerName(void);
 		std::string getHost(void);
 		std::string getPort(void);
+		std::string getBodySize(void);
 		bool getFlagLoc(void);
 		std::string getLocPath(void);
 
 	private:
 		bool flag_loc;
+		std::string server_name;
+		std::string host;
 		std::string port;
+		std::string max_body_size;
 		std::string error_pages;
 		std::string loc_path;
-		std::string host;
 		std::map < std::string, std::map<std::string, std::string> > location;
 };

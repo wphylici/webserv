@@ -6,7 +6,7 @@
 /*   By: wphylici <wphylici@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/19 22:30:19 by wphylici          #+#    #+#             */
-/*   Updated: 2021/05/23 20:48:08 by wphylici         ###   ########.fr       */
+/*   Updated: 2021/05/25 03:14:25 by wphylici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,29 +35,30 @@ void head_conf(std::string str, int count_tab)
 	del_space_chars(&str);
 	if (str.size() > 1)
 		throw "invalid symbols";
-	if (str[0] != '{')
-		throw "expected '{'";
 }
 
-void host_conf(std::string str, int count_tab)
+void host_conf(std::string *str, int count_tab)
 {
 	if (count_tab != 1)
 		throw "invalide tabulation";
-	str.erase(0, 4);
-	if (str[0] != ' ')
+	if (str->substr(0, str->find(' ')).find(':') == str->npos)
+		throw "expected ':' after key name";
+	str->erase(0, str->substr(0, str->find(' ')).find(':') + 1);
+	del_space_chars(str);
+	if (std::count(str->begin(), str->end(), ' '))
 		throw "invalid symbols";
-	del_space_chars(&str);
-	servinfo.setHost(str);
 }
 
 void port_conf(std::string str, int count_tab)
 {
 	if (count_tab != 1)
 		throw "invalide tabulation";
-	str.erase(0, 4);
-	if (str[0] != ' ')
-		throw "invalid symbols";
+	if (str[4] != ':')
+		throw "expected ':' after key name";
+	str.erase(0, 5);
 	del_space_chars(&str);
+	if (std::count(str.begin(), str.end(), ' '))
+		throw "invalid symbols";
 	servinfo.setPort(str);
 }
 
@@ -69,9 +70,9 @@ void parse_inside_loc(std::string str, int count_tab)
 		throw "invalide tabulation";
 	if (!str.compare(0, 4, "root"))
 	{
-		str.erase(0, 4);
-		if (str[0] != ' ')
-			throw "invalid symbols";
+		if (str[4] != ':')
+			throw "expected ':' after key name";
+		str.erase(0, 5);
 		del_space_chars(&str);
 		tmp[servinfo.getLocPath()]["root"] = str;
 		servinfo.setMap(tmp);
@@ -88,11 +89,11 @@ void location_conf(std::string str, int count_tab)
 	{
 		if (count_tab != 1)
 			throw "invalide tabulation";
-		str.erase(0, 8);
-		if (str[0] != ' ')
-			throw "invalid symbols";
+		if (str[8] != ':')
+			throw "expected ':' after key name";
+		str.erase(0, 9);
 		del_space_chars(&str);
-		for (size_t i = 0; str[i] != ' ' && str[i] != '{'; i++)
+		for (size_t i = 0; str[i] != ' '; i++)
 		{
 			loc_path_tmp.resize(i + 1);
 			loc_path_tmp[i] = str[i];
@@ -102,8 +103,6 @@ void location_conf(std::string str, int count_tab)
 		del_space_chars(&str);
 		if (str.size() > 1)
 			throw "invalid symbols";
-		if (str[0] != '{')
-			throw "expected '{'";
 		servinfo.setFlagLoc(true);
 	}
 	else
@@ -125,14 +124,20 @@ void parse(char *line)
 		flag_serv = 1;
 	}
 	else if (!str.compare(0, 4, "host"))
-		host_conf(str, count_tab);
+	{
+		host_conf(&str, count_tab);
+		servinfo.setHost(str.substr(0, str.find(' ')));
+	}
 	else if (!str.compare(0, 4, "port"))
-		port_conf(str, count_tab);
-	else if ((!str.compare(0, 8, "location") || servinfo.getFlagLoc() == true) &&
-	str != "}")
+	{
+		host_conf(&str, count_tab);
+		servinfo.setPort(str.substr(0, str.find(' ')));
+	}
+	else if ((!str.compare(0, 8, "location") || servinfo.getFlagLoc() == true))
 	{
 		location_conf(str, count_tab);
 	}
+
 	// else if (!str.empty())
 	// 	throw "invalid symbols";
 }
@@ -159,18 +164,13 @@ void read_conf()
 		n_line++;
 	}
 	free(line);
-	std::cout << servinfo.getHost() << std::endl;
-	std::cout << servinfo.getPort() << std::endl;
-	std::cout << servinfo.getMap()[servinfo.getLocPath()]["root"] << std::endl;
+	std::cout << "host: " << servinfo.getHost() << std::endl;
+	std::cout << "port: " << servinfo.getPort() << std::endl;
+	std::cout << "root: " << servinfo.getMap()[servinfo.getLocPath()]["root"] << std::endl;
 }
 
 int main ()
 {
-	// std::map < std::string, std::map<std::string, std::string> > tmp;
-
-	// tmp["/"]["host"] = "google.com", tmp["/"]["port"] = "8080";
-	// std::cout << tmp["/"]["host"] << std::endl;
-
 	read_conf();
 	return (0);
 }

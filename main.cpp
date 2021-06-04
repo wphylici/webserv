@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wphylici <wphylici@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wphylici <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/19 22:30:19 by wphylici          #+#    #+#             */
-/*   Updated: 2021/05/25 07:33:33 by wphylici         ###   ########.fr       */
+/*   Updated: 2021/06/04 06:16:03 by wphylici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "get_next_line/get_next_line.h"
 
 Server servinfo;
+int pos_loc = -1;
 
 void del_space_chars(std::string *str)
 {
@@ -27,7 +28,7 @@ void del_space_chars(std::string *str)
 		str->erase(0, 1);
 }
 
-void first_level_field(std::string *str, int count_tab)
+void field_valid_check(std::string *str, int count_tab)
 {
 	if (((str->substr(0, str->find(':')) == "server" && count_tab > 0) ||
 		(str->substr(0, str->find(':')) != "server" && count_tab != 1) ||
@@ -46,108 +47,73 @@ void first_level_field(std::string *str, int count_tab)
 		throw "invalid symbols";
 }
 
-void parse_inside_loc(std::string str, int count_tab)
+void parse_2nd_level(std::string str, int count_tab)
 {
+	std::string tmp;
+	static std::map < std::string, std::map<std::string, std::string> > tmp_map_loc;
+	std::string second_level[5] = {"root", "index", "method", "cgi_extension", "autoindex"};
 
-	// if (count_tab != 2)
-	// 	throw "invalide tabulation";
-	if (!str.compare(0, 4, "root"))
+	tmp = str.substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':'));
+	for (size_t i = 0; i < 5; i++)
 	{
-		if (str[4] != ':')
-			throw "expected ':' after key name";
-		str.erase(0, 5);
-		del_space_chars(&str);
-		// tmp[servinfo.getLocPath()]["root"] = str;
+		if (second_level[i] == tmp)
+		{
+			field_valid_check(&str, count_tab);
+			tmp_map_loc[servinfo.getLocPath(pos_loc)][tmp] = str.substr(0, str.find(' '));
+			servinfo.setMapLoc(tmp_map_loc);
+			return ;
+		}
 	}
-	// else if (!str.empty())
-	// 	throw "invalid symbols";
+	if (!tmp.empty())
+		throw "invalid symbols";
 }
 
-void location_conf(std::string str, int count_tab)
+void parse_1st_level(std::string str, int count_tab)
 {
-	static std::map < std::string, std::map<std::string, std::string> > tmp;
+	std::string tmp;
+	static std::map <std::string, std::string> tmp_map_1lvl;
+	std::string first_level[6] = {"server", "server_name", "host", "port", "max_body_size", "location"};
 
-	if (servinfo.getFlagLoc() == false)
+	tmp = str.substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':'));
+	for (size_t i = 0; i < 6; i++)
 	{
-		first_level_field(&str, count_tab);
-		servinfo.setLocPath(str);
-		servinfo.setFlagLoc(true);
-	}
-	else
-	{
-		if (count_tab != 2)
-			throw "invalide tabulation";
-		if (str.substr(0, str.find(':')) == "root")
+		if (first_level[i] == tmp)
 		{
-			first_level_field(&str, count_tab);
-			tmp[servinfo.getLocPath()]["root"] = str;
-		}
-		else if (str.substr(0, str.find(':')) == "index")
-		{
-			first_level_field(&str, count_tab);
-			tmp[servinfo.getLocPath()]["index"] = str;
-		}
-		else if (str.substr(0, str.find(':')) == "method")
-		{
-			first_level_field(&str, count_tab);
-			tmp[servinfo.getLocPath()]["method"] = str;
-		}
-		else if (str.substr(0, str.find(':')) == "cgi_extension")
-		{
-			first_level_field(&str, count_tab);
-			tmp[servinfo.getLocPath()]["cgi_extension"] = str;
-		}
-		else if (str.substr(0, str.find(':')) == "autoindex")
-		{
-			first_level_field(&str, count_tab);
-			tmp[servinfo.getLocPath()]["autoindex"] = str;
+			if (tmp == "location")
+			{
+				field_valid_check(&str, count_tab);
+				servinfo.setLocPath(str, pos_loc);
+				servinfo.setFlagLoc(true);
+				return ;
+			}
+			field_valid_check(&str, count_tab);
+			tmp == "server" && !str.empty() ? throw "invalid symbols" : 0;
+			tmp_map_1lvl[tmp] = str.substr(0, str.find(' '));
+			servinfo.setMapHeadFields(tmp_map_1lvl);
+			return ;
 		}
 	}
-	servinfo.setMap(tmp);
+	if (!tmp.empty())
+		throw "invalid symbols";
 }
 
 void parse(char *line)
 {
 	int count_tab = 0;
-	static int flag_serv = 0;
 	std::string str = line;
 
 	for (size_t i = 0; str[i] == '\t'; i++)
 		count_tab++;
 	del_space_chars(&str);
-	if (str.substr(0, str.find(':')) == "server")
-		first_level_field(&str, count_tab);
-	else if (str.substr(0, str.find(':') < 0 ? str.find(' ') :
-			str.find(':')) == "server_name")
+	if (str.substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':')) == "location")
 	{
-		first_level_field(&str, count_tab);
-		servinfo.setServerName(str.substr(0, str.find(' ')));
+		pos_loc++;
+		servinfo.setFlagLoc(false);
 	}
-	else if (str.substr(0, str.find(':') < 0 ? str.find(' ') :
-			str.find(':')) == "host")
-	{
-		first_level_field(&str, count_tab);
-		servinfo.setHost(str.substr(0, str.find(' ')));
-	}
-	else if (str.substr(0, str.find(':') < 0 ? str.find(' ') :
-			str.find(':')) == "port")
-	{
-		first_level_field(&str, count_tab);
-		servinfo.setPort(str.substr(0, str.find(' ')));
-	}
-	else if (str.substr(0, str.find(':') < 0 ? str.find(' ') :
-			str.find(':')) == "max_body_size")
-	{
-		first_level_field(&str, count_tab);
-		servinfo.setBodySize(str.substr(0, str.find(' ')));
-	}
-	else if ((str.substr(0, str.find(':') < 0 ? str.find(' ') :
-			str.find(':')) == "location" || servinfo.getFlagLoc() == true))
-	{
-		location_conf(str, count_tab);
-	}
-	else if (!str.empty())
-		throw "invalid symbols";
+	if (servinfo.getFlagLoc() == false)
+		parse_1st_level(str, count_tab);
+	else
+		parse_2nd_level(str, count_tab);
 }
 
 void read_conf()
@@ -172,17 +138,22 @@ void read_conf()
 		n_line++;
 	}
 	free(line);
-	std::cout << "server_name: " << servinfo.getServerName() << std::endl;
-	std::cout << "host: " << servinfo.getHost() << std::endl;
-	std::cout << "port: " << servinfo.getPort() << std::endl;
-	std::cout << "max_body_size: " << servinfo.getBodySize() << std::endl << std::endl;
-	std::cout << "location path: " << servinfo.getLocPath() << std::endl;
+	std::cout << "server_name: " << servinfo.getMapHeadFields()["server_name"] << std::endl;
+	std::cout << "host: " << servinfo.getMapHeadFields()["host"] << std::endl;
+	std::cout << "port: " << servinfo.getMapHeadFields()["port"] << std::endl;
+	std::cout << "max_body_size: " << servinfo.getMapHeadFields()["max_body_size"] << std::endl << std::endl;
 
-	std::cout << "	root: " << servinfo.getMap()[servinfo.getLocPath()]["root"] << std::endl;
-	std::cout << "	index: " << servinfo.getMap()[servinfo.getLocPath()]["index"] << std::endl;
-	std::cout << "	method: " << servinfo.getMap()[servinfo.getLocPath()]["method"] << std::endl;
-	std::cout << "	cgi_extension: " << servinfo.getMap()[servinfo.getLocPath()]["cgi_extension"] << std::endl;
-	std::cout << "	autoindex: " << servinfo.getMap()[servinfo.getLocPath()]["autoindex"] << std::endl;
+	for (size_t i = 0; i <= pos_loc; i++)
+	{
+		std::cout << "location path: " << servinfo.getLocPath(i) << std::endl;
+		std::cout << "	root: " << servinfo.getMapLoc()[servinfo.getLocPath(i)]["root"] << std::endl;
+		std::cout << "	index: " << servinfo.getMapLoc()[servinfo.getLocPath(i)]["index"] << std::endl;
+		std::cout << "	method: " << servinfo.getMapLoc()[servinfo.getLocPath(i)]["method"] << std::endl;
+		std::cout << "	cgi_extension: " << servinfo.getMapLoc()[servinfo.getLocPath(i)]["cgi_extension"] << std::endl;
+		std::cout << "	autoindex: " << servinfo.getMapLoc()[servinfo.getLocPath(i)]["autoindex"] << std::endl;
+	}
+
+
 }
 
 int main ()

@@ -34,29 +34,33 @@ class Server
 	public:
 		Server();
 		~Server();
-		// void Server::setMap(std::string loc_name, std::string field, std::string value);
-		void setServerName(std::string ServerName);
-		void setHost(std::string Host);
-		void setPort(std::string Port);
-		void setBodySize(std::string BodySize);
+
+		// void setServerName(std::string ServerName);
+		// void setHost(std::string Host);
+		// void setPort(std::string Port);
+		// void setBodySize(std::string BodySize);
 		void setFlagLoc(bool FlagLoc);
-		void setLocPath(std::string LocPath);
-		void setMap(std::map < std::string, std::map<std::string, std::string> > map);
-		std::map < std::string, std::map<std::string, std::string> > getMap(void);
-		std::string getServerName(void);
-		std::string getHost(void);
-		std::string getPort(void);
-		std::string getBodySize(void);
+		void setLocPath(std::string LocPath, int pos);
+		void setMapLoc(std::map < std::string, std::map<std::string, std::string> > map);
+		void setMapHeadFields(std::map <std::string, std::string> map);
+
+		// std::string getServerName(void);
+		// std::string getHost(void);
+		// std::string getPort(void);
+		// std::string getBodySize(void);
 		bool getFlagLoc(void);
-		std::string getLocPath(void);
+		std::string getLocPath(int pos);
+		std::map < std::string, std::map<std::string, std::string> > getMapLoc(void);
+		std::map <std::string, std::string> getMapHeadFields(void);
 
 	private:
+		// std::string server_name;
+		// std::string host;
+		// std::string port;
+		// std::string max_body_size;
+		// std::string error_pages;
 		bool flag_loc;
-		std::string server_name;
-		std::string host;
-		std::string port;
-		std::string max_body_size;
-		std::string error_pages;
-		std::string loc_path;
+		std::string loc_path[1000];
 		std::map < std::string, std::map<std::string, std::string> > location;
+		std::map <std::string, std::string> head_fields;
 };

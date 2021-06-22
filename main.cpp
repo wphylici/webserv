@@ -6,7 +6,7 @@
 /*   By: wphylici <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/19 22:30:19 by wphylici          #+#    #+#             */
-/*   Updated: 2021/06/22 03:15:07 by wphylici         ###   ########.fr       */
+/*   Updated: 2021/06/22 04:42:41 by wphylici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ void check_tabs(std::string *str, int count_tab)
 void field_valid_check(std::string *str, int count_tab)
 {
 	int flag_method_and_errors = 0;
-	str->substr(0, str->find(':') == -1 ? str->find(' ') : str->find(':')) == "method" ||
-	str->substr(0, str->find(':') == -1 ? str->find(' ') : str->find(':')) == "error_page" ?
+	str->substr(0, str->find(':') == std::string::npos ? str->find(' ') : str->find(':')) == "method" ||
+	str->substr(0, str->find(':') == std::string::npos ? str->find(' ') : str->find(':')) == "error_page" ?
 	flag_method_and_errors = 1 : 0;
 	check_tabs(str, count_tab);
 	if (str->substr(0, str->find(' ')).find(':') == str->npos)
@@ -59,7 +59,7 @@ void parse_2nd_level(std::string str, int count_tab)
 	std::string tmp;
 	std::string second_level[5] = {"root", "index", "method", "cgi_extension", "autoindex"};
 
-	tmp = str.substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':'));
+	tmp = str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':'));
 	g_servinfo[g_pos_serv]->getMapLoc()[g_servinfo[g_pos_serv]->getValueLocPath()[g_pos_loc]].count(tmp) == 1 ? throw "double field" : 0;
 	for (size_t i = 0; i < 5; i++)
 	{
@@ -98,7 +98,7 @@ void parse_1st_level(std::string str, int count_tab)
 	std::string tmp;
 	std::string first_level[7] = {"server", "server_name", "host", "port", "max_body_size", "location", "error_page"};
 
-	tmp = str.substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':'));
+	tmp = str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':'));
 	g_servinfo[g_pos_serv]->getMapHeadFields().count(tmp) == 1 ? throw "double field" : 0;
 	for (size_t i = 0; i < 7; i++)
 	{
@@ -120,7 +120,7 @@ void parse_1st_level(std::string str, int count_tab)
 		if (tmp == "location")
 		{
 			field_valid_check(&str, count_tab);
-			for (size_t i = 0; i < g_pos_loc; i++)
+			for (int i = 0; i < g_pos_loc; i++)
 			{
 				if (g_servinfo[g_pos_serv]->getLocPath()[0][i] == str)
 					throw "double location path";
@@ -159,14 +159,16 @@ void parse(char *line)
 	for (size_t i = 0; str[i] == '\t'; i++)
 		count_tab++;
 	del_space_chars(&str);
-	if (str .substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':')) == "server")
+	if (str[0] == '#')
+		return ;
+	if (str .substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':')) == "server")
 		check_delimiter(count_serv++);
-	if (str.substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':')) == "location")
+	if (str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':')) == "location")
 	{
 		g_pos_loc++;
 		g_servinfo[g_pos_serv]->setFlagLoc(false);
 	}
-	if (str.substr(0, str.find(':') == -1 ? str.find(' ') : str.find(':')) == "---")
+	if (str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':')) == "---")
 	{
 		g_pos_serv++;
 		g_pos_loc = -1;
@@ -178,29 +180,9 @@ void parse(char *line)
 		parse_2nd_level(str, count_tab);
 }
 
-void read_conf()
+void test_print(void)
 {
-	char *line;
-	int n_line = 1;
-	int fd = open("default.conf", O_RDONLY);;
-
-	while (get_next_line(fd, &line) > 0)
-	{
-		try
-		{
-			parse(line);
-		}
-		catch(const char *ex)
-		{
-			std::cerr << BHI_RED << "config file error: " << RESET << ex
-			<< "  (line: " << n_line << ")" << '\n';
-			exit (EXIT_FAILURE);
-		}
-		free(line);
-		n_line++;
-	}
-	free(line);
-	for (size_t j = 0; j <= g_pos_serv; j++)
+	for (int j = 0; j <= g_pos_serv; j++)
 	{
 		std::cout << "server_name: " << g_servinfo[j]->getMapHeadFields()["server_name"] << std::endl;
 		std::cout << "host: " << g_servinfo[j]->getMapHeadFields()["host"] << std::endl;
@@ -209,7 +191,7 @@ void read_conf()
 		std::cout << "error_page: " << g_servinfo[j]->getErrorPages()["404"] << std::endl;
 		std::cout << "error_page: " << g_servinfo[j]->getErrorPages()["403"] << std::endl << std::endl;
 
-		for (size_t i = 0; i <= g_pos_loc; i++)
+		for (int i = 0; i <= g_pos_loc; i++)
 		{
 			std::cout << "location path: " << g_servinfo[j]->getValueLocPath()[i] << std::endl;
 			std::cout << "	root: " << g_servinfo[j]->getMapLoc()[g_servinfo[j]->getValueLocPath()[i]]["root"] << std::endl;
@@ -229,11 +211,38 @@ void read_conf()
 	}
 }
 
+void read_conf()
+{
+	char *line;
+	int n_line = 1;
+	int fd = open("default.conf", O_RDONLY);;
+	
+	try
+	{
+		while (get_next_line(fd, &line) > 0)
+		{
+			parse(line);
+			free(line);
+			n_line++;
+		}
+		parse(line);
+		free(line);
+	}
+	catch(const char *ex)
+	{
+		std::cerr << BHI_RED << "config file error: " << RESET << ex
+		<< "  (line: " << n_line << ")" << '\n';
+		exit(EXIT_FAILURE);
+	}
+	test_print();
+}
+
+
 int main ()
 {
 	g_servinfo.push_back(new Server());
 	read_conf();
-	for (size_t i = 0; i <= g_pos_serv; i++)
+	for (int i = 0; i <= g_pos_serv; i++)
 		delete g_servinfo[i];
 	return (0);
 }

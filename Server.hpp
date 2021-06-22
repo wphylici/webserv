@@ -37,7 +37,6 @@ class Server
 	public:
 		Server();
 		~Server();
-		Server(Server const &server);
 
 		// set
 		void setFlagLoc(bool FlagLoc);
@@ -57,8 +56,6 @@ class Server
 		std::map <std::string, std::string> &getMapHeadFields(void);
 
 	private:
-		Server &operator=(Server const &server);
-
 		bool _flag_loc;
 		std::vector < std::vector <std::string> > _loc_path;
 		std::map < int, std::map<int, std::string> > _methods;

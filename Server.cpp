@@ -11,12 +11,6 @@ Server::~Server()
 
 }
 
-Server::Server(Server const &server)
-{
-	this->_flag_loc = false;
-	this->_loc_path.push_back(std::vector<std::string>());
-}
-
 // void Server::setServerName(std::string ServerName)
 // {
 // 	this->_server_name = ServerName;

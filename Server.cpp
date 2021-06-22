@@ -2,7 +2,8 @@
 
 Server::Server()
 {
-	this->flag_loc = 0;
+	this->_flag_loc = false;
+	this->_loc_path.push_back(std::vector<std::string>());
 }
 
 Server::~Server()
@@ -10,82 +11,113 @@ Server::~Server()
 
 }
 
+Server::Server(Server const &server)
+{
+	this->_flag_loc = false;
+	this->_loc_path.push_back(std::vector<std::string>());
+}
+
 // void Server::setServerName(std::string ServerName)
 // {
-// 	this->server_name = ServerName;
+// 	this->_server_name = ServerName;
 // }
 
 // void Server::setHost(std::string Host)
 // {
-// 	this->host = Host;
+// 	this->_host = Host;
 // }
 
 // void Server::setPort(std::string Port)
 // {
-// 	this->port = Port;
+// 	this->_port = Port;
 // }
 
 // void Server::setBodySize(std::string BodySize)
 // {
-// 	this->max_body_size = BodySize;
+// 	this->_max_body_size = BodySize;
 // }
 
-void Server::setLocPath(std::string LocPath, int pos)
+void Server::setLocPath(std::string LocPath)
 {
-	this->loc_path[pos] = LocPath;
+	this->_loc_path[this->_loc_path.size() - 1].push_back(LocPath);
 }
 
 void Server::setFlagLoc(bool FlagLoc)
 {
-	this->flag_loc = FlagLoc;
+	this->_flag_loc = FlagLoc;
+}
+
+void Server::seMethods(std::map < int, std::map<int, std::string> > methods)
+{
+	this->_methods = methods;
 }
 
 void Server::setMapLoc(std::map < std::string, std::map<std::string, std::string> > map)
 {
-	this->location = map;
+	this->_location = map;
 }
 
-void Server::setMapHeadFields(std::map <std::string, std::string> map)
+void Server::setMapHeadFields(std::map <std::string, std::string> map_head_fields)
 {
-	this->head_fields = map;
+	this->_head_fields = map_head_fields;
+}
+
+void Server::setErrorPages(std::map <std::string, std::string> error_pages)
+{
+	this->_error_pages = error_pages;
 }
 
 // std::string Server::getServerName(void)
 // {
-// 	return (this->server_name);
+// 	return (this->_server_name);
 // }
 
 // std::string Server::getHost(void)
 // {
-// 	return (this->host);
+// 	return (this->_host);
 // }
 
 // std::string Server::getPort(void)
 // {
-// 	return (this->port);
+// 	return (this->_port);
 // }
 
 // std::string Server::getBodySize(void)
 // {
-// 	return (this->max_body_size);
+// 	return (this->_max_body_size);
 // }
 
 bool Server::getFlagLoc(void)
 {
-	return (this->flag_loc);
+	return (this->_flag_loc);
 }
 
-std::string Server::getLocPath(int pos)
+std::vector <std::string> Server::getValueLocPath(void)
 {
-	return (this->loc_path[pos]);
+	return(this->_loc_path[0]);
 }
 
-std::map < std::string, std::map<std::string, std::string> > Server::getMapLoc(void)
+std::vector < std::vector <std::string> > Server::getLocPath()
 {
-	return (this->location);
+	return (this->_loc_path);
 }
 
-std::map <std::string, std::string> Server::getMapHeadFields(void)
+std::map < int, std::map<int, std::string> > &Server::getMethods(void)
 {
-	return (this->head_fields);
+	return (this->_methods);
+}
+
+std::map < std::string, std::map<std::string, std::string> > &Server::getMapLoc(void)
+{
+	return (this->_location);
+}
+
+std::map <std::string, std::string> &Server::getErrorPages(void)
+{
+	return (this->_error_pages);
+}
+
+std::map <std::string, std::string> &Server::getMapHeadFields(void)
+{
+	return (this->_head_fields);
 }

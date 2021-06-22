@@ -6,7 +6,7 @@
 # define HI_RED			"\e[0;91m"
 # define HI_GREEN		"\e[0;92m"
 # define HI_YELLOW		"\e[0;93m"
-# define HI_BLUE		"\e[0;94m"
+# define HI_BLUE		"\e[0;94m"46
 # define HI_PURPLE		"\e[0;95m"
 # define HI_CYAN		"\e[0;96m"
 # define HI_WHITE		"\e[0;97m"
@@ -28,39 +28,45 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
+#include <sstream>
+#include <string>
 
 class Server
 {
 	public:
 		Server();
 		~Server();
+		Server(Server const &server);
 
-		// void setServerName(std::string ServerName);
-		// void setHost(std::string Host);
-		// void setPort(std::string Port);
-		// void setBodySize(std::string BodySize);
+		// set
 		void setFlagLoc(bool FlagLoc);
-		void setLocPath(std::string LocPath, int pos);
+		void setLocPath(std::string LocPath);
+		void seMethods(std::map < int, std::map<int, std::string> > methods);
 		void setMapLoc(std::map < std::string, std::map<std::string, std::string> > map);
-		void setMapHeadFields(std::map <std::string, std::string> map);
+		void setMapHeadFields(std::map <std::string, std::string> map_head_fields);
+		void setErrorPages(std::map <std::string, std::string> error_pages);
 
-		// std::string getServerName(void);
-		// std::string getHost(void);
-		// std::string getPort(void);
-		// std::string getBodySize(void);
+		//get
 		bool getFlagLoc(void);
-		std::string getLocPath(int pos);
-		std::map < std::string, std::map<std::string, std::string> > getMapLoc(void);
-		std::map <std::string, std::string> getMapHeadFields(void);
+		std::vector <std::string> getValueLocPath();
+		std::vector < std::vector <std::string> > getLocPath();
+		std::map < int, std::map<int, std::string> > &getMethods(void);
+		std::map < std::string, std::map<std::string, std::string> > &getMapLoc(void);
+		std::map <std::string, std::string> &getErrorPages(void);
+		std::map <std::string, std::string> &getMapHeadFields(void);
 
 	private:
-		// std::string server_name;
-		// std::string host;
-		// std::string port;
-		// std::string max_body_size;
-		// std::string error_pages;
-		bool flag_loc;
-		std::string loc_path[1000];
-		std::map < std::string, std::map<std::string, std::string> > location;
-		std::map <std::string, std::string> head_fields;
+		Server &operator=(Server const &server);
+
+		bool _flag_loc;
+		std::vector < std::vector <std::string> > _loc_path;
+		std::map < int, std::map<int, std::string> > _methods;
+		std::map <std::string, std::string> _error_pages;
+		std::map < std::string, std::map<std::string, std::string> > _location;
+		std::map <std::string, std::string> _head_fields;
 };
+
+extern int g_pos_loc;
+extern int g_pos_serv;
+extern std::vector <Server *> g_servinfo;

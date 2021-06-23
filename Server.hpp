@@ -43,7 +43,9 @@ class Server
 		void setLocPath(std::string LocPath);
 
 		// GET
+		int getPosServ(void);
 		bool getFlagLoc(void);
+		std::vector <Server *> getServInfo(void);
 		std::vector <std::string> getValueLocPath(void);
 		std::vector < std::vector <std::string> > getLocPath(void);
 		std::map < int, std::map<int, std::string> > &getMethods(void);

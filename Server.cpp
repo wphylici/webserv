@@ -29,6 +29,16 @@ void Server::setFlagLoc(bool FlagLoc)
 
 // GET
 
+int Server::getPosServ(void)
+{
+	return (this->_pos_serv);
+}
+
+std::vector <Server *> Server::getServInfo(void)
+{
+	return (this->_servinfo);
+}
+
 bool Server::getFlagLoc(void)
 {
 	return (this->_flag_loc);
@@ -287,6 +297,4 @@ void Server::ParseConf(void)
 {
 	_servinfo.push_back(new Server());
 	ReadConf();
-	for (int i = 0; i <= _pos_serv; i++)
-		delete _servinfo[i];
 }

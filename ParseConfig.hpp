@@ -1,6 +1,8 @@
-#pragma once
 
 /* Повышенной интенсивности (High Intensty) */
+
+#ifndef ParseConfigIG_HPP
+#define ParseConfigIG_HPP
 
 # define HI_BLACK		"\e[0;90m"
 # define HI_RED			"\e[0;91m"
@@ -32,11 +34,11 @@
 #include <vector>
 #include "get_next_line/get_next_line.h"
 
-class Server
+class ParseConfig
 {
 	public:
-		Server();
-		~Server();
+		ParseConfig();
+		~ParseConfig();
 
 		// SET
 		void setFlagLoc(bool FlagLoc);
@@ -45,7 +47,7 @@ class Server
 		// GET
 		int getPosServ(void);
 		bool getFlagLoc(void);
-		std::vector <Server *> getServInfo(void);
+		std::vector <ParseConfig *> getServInfo(void);
 		std::vector <std::string> getValueLocPath(void);
 		std::vector < std::vector <std::string> > getLocPath(void);
 		std::map < int, std::map<int, std::string> > &getMethods(void);
@@ -73,10 +75,13 @@ class Server
 		int _pos_serv;
 		int _count_tab;
 
-		std::vector <Server *> _servinfo;
+		std::vector <ParseConfig *> _servinfo;
 		std::vector < std::vector <std::string> > _loc_path;
 		std::map < int, std::map<int, std::string> > _methods;
 		std::map <std::string, std::string> _error_pages;
 		std::map < std::string, std::map<std::string, std::string> > _location;
 		std::map <std::string, std::string> _head_fields;
 };
+
+
+#endif

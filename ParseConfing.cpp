@@ -1,6 +1,6 @@
-#include "Server.hpp"
+#include "ParseConfig.hpp"
 
-Server::Server()
+ParseConfig::ParseConfig()
 {
 	this->_pos_loc = -1;
 	this->_pos_serv = 0;
@@ -10,77 +10,77 @@ Server::Server()
 	this->_loc_path.push_back(std::vector<std::string>());
 }
 
-Server::~Server()
+ParseConfig::~ParseConfig()
 {
 
 }
 
 // SET
 
-void Server::setLocPath(std::string LocPath)
+void ParseConfig::setLocPath(std::string LocPath)
 {
 	this->_loc_path[this->_loc_path.size() - 1].push_back(LocPath);
 }
 
-void Server::setFlagLoc(bool FlagLoc)
+void ParseConfig::setFlagLoc(bool FlagLoc)
 {
 	this->_flag_loc = FlagLoc;
 }
 
 // GET
 
-int Server::getPosServ(void)
+int ParseConfig::getPosServ(void)
 {
 	return (this->_pos_serv);
 }
 
-std::vector <Server *> Server::getServInfo(void)
+std::vector <ParseConfig *> ParseConfig::getServInfo(void)
 {
 	return (this->_servinfo);
 }
 
-bool Server::getFlagLoc(void)
+bool ParseConfig::getFlagLoc(void)
 {
 	return (this->_flag_loc);
 }
 
-std::vector <std::string> Server::getValueLocPath(void)
+std::vector <std::string> ParseConfig::getValueLocPath(void)
 {
 	return(this->_loc_path[0]);
 }
 
-std::vector < std::vector <std::string> > Server::getLocPath()
+std::vector < std::vector <std::string> > ParseConfig::getLocPath()
 {
 	return (this->_loc_path);
 }
 
-std::map < int, std::map<int, std::string> > &Server::getMethods(void)
+std::map < int, std::map<int, std::string> > &ParseConfig::getMethods(void)
 {
 	return (this->_methods);
 }
 
-std::map < std::string, std::map<std::string, std::string> > &Server::getMapLoc(void)
+std::map < std::string, std::map<std::string, std::string> > &ParseConfig::getMapLoc(void)
 {
 	return (this->_location);
 }
 
-std::map <std::string, std::string> &Server::getErrorPages(void)
+std::map <std::string, std::string> &ParseConfig::getErrorPages(void)
 {
 	return (this->_error_pages);
 }
 
-std::map <std::string, std::string> &Server::getMapHeadFields(void)
+std::map <std::string, std::string> &ParseConfig::getMapHeadFields(void)
 {
 	return (this->_head_fields);
 }
 
-void Server::DelSpaceChars(std::string *str)
+void ParseConfig::DelSpaceChars(std::string *str)
 {
 	while((*str)[0] == '\t' || (*str)[0] == ' ')
 		str->erase(0, 1);
 }
 
-void Server::CheckTabs(std::string *str)
+void ParseConfig::CheckTabs(std::string *str)
 {
 	if (_servinfo[_pos_serv]->_flag_loc == true && _count_tab != 2)
 		throw "invalide tabulation";
@@ -91,7 +91,7 @@ void Server::CheckTabs(std::string *str)
 		throw "invalide tabulation";
 }
 
-void Server::FieldValidCheck(std::string *str)
+void ParseConfig::FieldValidCheck(std::string *str)
 {
 	int flag_method_and_errors = 0;
 	str->substr(0, str->find(':') == std::string::npos ? str->find(' ') : str->find(':')) == "method" ||
@@ -109,7 +109,7 @@ void Server::FieldValidCheck(std::string *str)
 		throw "invalid symbols";
 }
 
-void Server::Parse2ndLevel(std::string str)
+void ParseConfig::Parse2ndLevel(std::string str)
 {
 	std::string tmp;
 	std::string second_level[5] = {"root", "index", "method", "cgi_extension", "autoindex"};
@@ -148,7 +148,7 @@ void Server::Parse2ndLevel(std::string str)
 		throw "invalid symbols";
 }
 
-void Server::Parse1stLevel(std::string str)
+void ParseConfig::Parse1stLevel(std::string str)
 {
 	std::string tmp;
 	std::string first_level[7] = {"server", "server_name", "host", "port", "max_body_size", "location", "error_page"};
@@ -196,7 +196,7 @@ void Server::Parse1stLevel(std::string str)
 		throw "invalid symbols";
 }
 
-void Server::CheckDelimiter()
+void ParseConfig::CheckDelimiter()
 {
 	if (_count_serv - 1 > _pos_serv)
 		throw "expected delimiter: '---'";
@@ -207,7 +207,7 @@ void Server::CheckDelimiter()
 	_count_serv++;
 }
 
-void Server::ParseStart(char *line)
+void ParseConfig::ParseStart(char *line)
 {
 	std::string str = line;
 
@@ -228,7 +228,7 @@ void Server::ParseStart(char *line)
 	{
 		_pos_serv++;
 		_pos_loc = -1;
-		_servinfo.push_back(new Server());
+		_servinfo.push_back(new ParseConfig());
 	}
 	else if (_servinfo[_pos_serv]->_flag_loc == false)
 		Parse1stLevel(str);
@@ -236,7 +236,7 @@ void Server::ParseStart(char *line)
 		Parse2ndLevel(str);
 }
 
-void Server::TestPrint(void)
+void ParseConfig::TestPrint(void)
 {
 	for (int j = 0; j <= _pos_serv; j++)
 	{
@@ -267,7 +267,7 @@ void Server::TestPrint(void)
 	}
 }
 
-void Server::ReadConf(void)
+void ParseConfig::ReadConf(void)
 {
 	char *line;
 	int n_line = 1;
@@ -293,8 +293,8 @@ void Server::ReadConf(void)
 	TestPrint();
 }
 
-void Server::ParseConf(void)
+void ParseConfig::ParseConf(void)
 {
-	_servinfo.push_back(new Server());
+	_servinfo.push_back(new ParseConfig());
 	ReadConf();
 }

@@ -6,7 +6,7 @@
 # define HI_RED			"\e[0;91m"
 # define HI_GREEN		"\e[0;92m"
 # define HI_YELLOW		"\e[0;93m"
-# define HI_BLUE		"\e[0;94m"46
+# define HI_BLUE		"\e[0;94m"
 # define HI_PURPLE		"\e[0;95m"
 # define HI_CYAN		"\e[0;96m"
 # define HI_WHITE		"\e[0;97m"
@@ -26,11 +26,11 @@
 
 # define RESET			"\e[0m"
 
+#include <fcntl.h>
 #include <iostream>
 #include <map>
 #include <vector>
-#include <sstream>
-#include <string>
+#include "get_next_line/get_next_line.h"
 
 class Server
 {
@@ -38,32 +38,43 @@ class Server
 		Server();
 		~Server();
 
-		// set
+		// SET
 		void setFlagLoc(bool FlagLoc);
 		void setLocPath(std::string LocPath);
-		void seMethods(std::map < int, std::map<int, std::string> > methods);
-		void setMapLoc(std::map < std::string, std::map<std::string, std::string> > map);
-		void setMapHeadFields(std::map <std::string, std::string> map_head_fields);
-		void setErrorPages(std::map <std::string, std::string> error_pages);
 
-		//get
+		// GET
 		bool getFlagLoc(void);
-		std::vector <std::string> getValueLocPath();
-		std::vector < std::vector <std::string> > getLocPath();
+		std::vector <std::string> getValueLocPath(void);
+		std::vector < std::vector <std::string> > getLocPath(void);
 		std::map < int, std::map<int, std::string> > &getMethods(void);
 		std::map < std::string, std::map<std::string, std::string> > &getMapLoc(void);
 		std::map <std::string, std::string> &getErrorPages(void);
 		std::map <std::string, std::string> &getMapHeadFields(void);
 
+		// METHODS
+		void ParseConf(void);
+		void ReadConf(void);
+		void TestPrint(void);
+		void ParseStart(char *line);
+		void CheckDelimiter();
+		void DelSpaceChars(std::string *str);
+		void Parse1stLevel(std::string str);
+		void Parse2ndLevel(std::string str);
+		void FieldValidCheck(std::string *str);
+		void CheckTabs(std::string *str);
+
+
 	private:
 		bool _flag_loc;
+		int _count_serv;
+		int _pos_loc;
+		int _pos_serv;
+		int _count_tab;
+
+		std::vector <Server *> _servinfo;
 		std::vector < std::vector <std::string> > _loc_path;
 		std::map < int, std::map<int, std::string> > _methods;
 		std::map <std::string, std::string> _error_pages;
 		std::map < std::string, std::map<std::string, std::string> > _location;
 		std::map <std::string, std::string> _head_fields;
 };
-
-extern int g_pos_loc;
-extern int g_pos_serv;
-extern std::vector <Server *> g_servinfo;

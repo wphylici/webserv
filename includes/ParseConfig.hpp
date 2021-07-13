@@ -2,7 +2,7 @@
 /* Повышенной интенсивности (High Intensty) */
 
 #ifndef ParseConfigIG_HPP
-#define ParseConfigIG_HPP
+# define ParseConfigIG_HPP
 
 # define HI_BLACK		"\e[0;90m"
 # define HI_RED			"\e[0;91m"
@@ -32,12 +32,13 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <string.h>
 #include "get_next_line/get_next_line.h"
 
 class ParseConfig
 {
 	public:
-		ParseConfig();
+		ParseConfig(char *configPath);
 		~ParseConfig();
 
 		// SET
@@ -69,6 +70,7 @@ class ParseConfig
 
 
 	private:
+		char *_configPath;
 		bool _flag_loc;
 		int _count_serv;
 		int _pos_loc;

@@ -1,7 +1,8 @@
 #include "ParseConfig.hpp"
 
-ParseConfig::ParseConfig()
+ParseConfig::ParseConfig(char *configPath)
 {
+	this->_configPath = configPath;
 	this->_pos_loc = -1;
 	this->_pos_serv = 0;
 	this->_count_tab = 0;
@@ -115,7 +116,7 @@ void ParseConfig::Parse2ndLevel(std::string str)
 	std::string second_level[5] = {"root", "index", "method", "cgi_extension", "autoindex"};
 
 	tmp = str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':'));
-	_servinfo[_pos_serv]->_location[_servinfo[_pos_serv]->getValueLocPath()[_servinfo[_pos_serv]->_pos_loc]].count(tmp) == 1 ? throw "double field" : 0;
+	_servinfo[_pos_serv]->_location[_servinfo[_pos_serv]->getValueLocPath()[_pos_loc]].count(tmp) == 1 ? throw "double field" : 0;
 	for (size_t i = 0; i < 5; i++)
 	{
 		if (tmp == "method")
@@ -126,13 +127,13 @@ void ParseConfig::Parse2ndLevel(std::string str)
 			tmp = strtok((char *)str.c_str(), " ");
 			for (size_t i = 0; tmp; i++)
 			{
-				for (size_t i = 0; _servinfo[_pos_serv]->_methods[_servinfo[_pos_serv]->_pos_loc].find(i) !=
-					_servinfo[_pos_serv]->_methods[_servinfo[_pos_serv]->_pos_loc].end(); i++)
+				for (size_t a = 0; _servinfo[_pos_serv]->_methods[_pos_loc].find(a) !=
+					_servinfo[_pos_serv]->_methods[_pos_loc].end(); a++)
 				{
-					if (_servinfo[_pos_serv]->_methods[_servinfo[_pos_serv]->_pos_loc][i] == tmp)
+					if (_servinfo[_pos_serv]->_methods[_pos_loc][a] == tmp)
 						throw "double method value";
 				}
-				_servinfo[_pos_serv]->_methods[_servinfo[_pos_serv]->_pos_loc][i] = std::string(tmp);
+				_servinfo[_pos_serv]->_methods[_pos_loc][i] = std::string(tmp);
 				tmp = strtok(NULL, " ");
 			}
 			return ;
@@ -140,7 +141,7 @@ void ParseConfig::Parse2ndLevel(std::string str)
 		if (second_level[i] == tmp)
 		{
 			FieldValidCheck(&str);
-			_servinfo[_pos_serv]->_location[_servinfo[_pos_serv]->getValueLocPath()[_servinfo[_pos_serv]->_pos_loc]][tmp] = str.substr(0, str.find(' '));
+			_servinfo[_pos_serv]->_location[_servinfo[_pos_serv]->getValueLocPath()[_pos_loc]][tmp] = str.substr(0, str.find(' '));
 			return ;
 		}
 	}
@@ -175,9 +176,9 @@ void ParseConfig::Parse1stLevel(std::string str)
 		if (tmp == "location")
 		{
 			FieldValidCheck(&str);
-			for (int i = 0; i < _servinfo[_pos_serv]->_pos_loc; i++)
+			for (int a = 0; a < _pos_loc; a++)
 			{
-				if (_servinfo[_pos_serv]->_loc_path[0][i] == str)
+				if (_servinfo[_pos_serv]->_loc_path[0][a] == str)
 					throw "double location path";
 			}
 			_servinfo[_pos_serv]->setLocPath(str);
@@ -221,13 +222,14 @@ void ParseConfig::ParseStart(char *line)
 		CheckDelimiter();
 	if (str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':')) == "location")
 	{
-		_servinfo[_pos_serv]->_pos_loc++;
+		_pos_loc++;
 		_servinfo[_pos_serv]->_flag_loc = false;
 	}
 	if (str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':')) == "---")
 	{
 		_pos_serv++;
-		_servinfo.push_back(new ParseConfig());
+		_pos_loc = -1;
+		_servinfo.push_back(new ParseConfig(_configPath));
 	}
 	else if (_servinfo[_pos_serv]->_flag_loc == false)
 		Parse1stLevel(str);
@@ -246,23 +248,23 @@ void ParseConfig::TestPrint(void)
 		std::cout << "error_page: " << _servinfo[j]->_error_pages["404"] << std::endl;
 		std::cout << "error_page: " << _servinfo[j]->_error_pages["403"] << std::endl << std::endl;
 
-		for (int i = 0; i <= _servinfo[j]->_pos_loc; i++)
+		for (int i = 0; i <= _pos_loc; i++)
 		{
 			std::cout << "location path: " << _servinfo[j]->getValueLocPath()[i] << std::endl;
 			std::cout << "	root: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["root"] << std::endl;
 			std::cout << "	index: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["index"] << std::endl;
 
 			std::cout << "	method: ";
-			for (size_t i = 0; _servinfo[j]->_methods[_servinfo[j]->_pos_loc].find(i) !=
-				_servinfo[j]->_methods[_servinfo[j]->_pos_loc].end(); i++)
-				std::cout << _servinfo[j]->_methods[_servinfo[j]->_pos_loc][i] << " ";
+			for (size_t a = 0; _servinfo[j]->_methods[_pos_loc].find(a) !=
+				_servinfo[j]->_methods[_pos_loc].end(); a++)
+				std::cout << _servinfo[j]->_methods[_pos_loc][a] << " ";
 			std::cout << std::endl;
 
 			std::cout << "	cgi_extension: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["cgi_extension"] << std::endl;
 			std::cout << "	autoindex: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["autoindex"] << std::endl;
-			std::cout << std::endl;
+
+			std::cout << std::endl << "---" << std::endl << std::endl;
 		}
-		std::cout << "---" << std::endl << std::endl;
 	}
 }
 
@@ -270,7 +272,7 @@ void ParseConfig::ReadConf(void)
 {
 	char *line;
 	int n_line = 1;
-	int fd = open("default.conf", O_RDONLY);;
+	int fd = open(_configPath, O_RDONLY);
 
 	try
 	{
@@ -289,11 +291,11 @@ void ParseConfig::ReadConf(void)
 		<< "  (line: " << n_line << ")" << '\n';
 		exit(EXIT_FAILURE);
 	}
-	TestPrint();
+	//TestPrint();
 }
 
 void ParseConfig::ParseConf(void)
 {
-	_servinfo.push_back(new ParseConfig());
+	_servinfo.push_back(new ParseConfig(_configPath));
 	ReadConf();
 }

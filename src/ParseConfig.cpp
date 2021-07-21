@@ -113,7 +113,7 @@ void ParseConfig::FieldValidCheck(std::string *str)
 void ParseConfig::Parse2ndLevel(std::string str)
 {
 	std::string tmp;
-	std::string second_level[5] = {"root", "index", "method", "cgi_extension", "autoindex"};
+	std::string second_level[5] = {"root", "index", "method", "cgi_path", "autoindex"};
 
 	tmp = str.substr(0, str.find(':') == std::string::npos ? str.find(' ') : str.find(':'));
 	_servinfo[_pos_serv]->_location[_servinfo[_pos_serv]->getValueLocPath()[_pos_loc]].count(tmp) == 1 ? throw "double field" : 0;
@@ -239,33 +239,6 @@ void ParseConfig::ParseStart(char *line)
 
 void ParseConfig::TestPrint(void)
 {
-	for (int j = 0; j <= _pos_serv; j++)
-	{
-		std::cout << "server_name: " << _servinfo[j]->_head_fields["server_name"] << std::endl;
-		std::cout << "host: " << _servinfo[j]->_head_fields["host"] << std::endl;
-		std::cout << "port: " << _servinfo[j]->_head_fields["port"] << std::endl;
-		std::cout << "max_body_size: " << _servinfo[j]->_head_fields["max_body_size"] << std::endl << std::endl;
-		std::cout << "error_page: " << _servinfo[j]->_error_pages["404"] << std::endl;
-		std::cout << "error_page: " << _servinfo[j]->_error_pages["403"] << std::endl << std::endl;
-
-		for (int i = 0; i <= _pos_loc; i++)
-		{
-			std::cout << "location path: " << _servinfo[j]->getValueLocPath()[i] << std::endl;
-			std::cout << "	root: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["root"] << std::endl;
-			std::cout << "	index: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["index"] << std::endl;
-
-			std::cout << "	method: ";
-			for (size_t a = 0; _servinfo[j]->_methods[_pos_loc].find(a) !=
-				_servinfo[j]->_methods[_pos_loc].end(); a++)
-				std::cout << _servinfo[j]->_methods[_pos_loc][a] << " ";
-			std::cout << std::endl;
-
-			std::cout << "	cgi_extension: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["cgi_extension"] << std::endl;
-			std::cout << "	autoindex: " << _servinfo[j]->_location[_servinfo[j]->getValueLocPath()[i]]["autoindex"] << std::endl;
-
-			std::cout << std::endl << "---" << std::endl << std::endl;
-		}
-	}
 }
 
 void ParseConfig::ReadConf(void)
@@ -291,7 +264,6 @@ void ParseConfig::ReadConf(void)
 		<< "  (line: " << n_line << ")" << '\n';
 		exit(EXIT_FAILURE);
 	}
-	//TestPrint();
 }
 
 void ParseConfig::ParseConf(void)

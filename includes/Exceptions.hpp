@@ -11,12 +11,12 @@ private:
 	virtual ~Exceptions();
 	Exceptions		&operator=(const Exceptions &);
 public:
-	class WrongArgsNumException : public std::exception{
-	public:
-		virtual const char  *what() const throw(){
-			return ("WRONG ARGUMENTS NUMBER");
-		}
-	};
+    class PortsException : public std::exception{
+    public:
+        virtual const char  *what() const throw(){
+            return ("ONE OF THE PORTS IS BUSY");
+        }
+    };
 	class SocketCreationException : public std::exception{
 	public:
 		virtual const char  *what() const throw(){
@@ -94,6 +94,34 @@ public:
 		virtual const char *what() const throw() {
 			std::cout << std::strerror(errno) << std::endl;
 			return ("No Such Error");
+		}
+	};
+	class WriteException : public std::exception{
+	public:
+		virtual const char  *what() const throw(){
+			std::cout << std::strerror(errno) << std::endl;
+			return ("WRITE ERROR");
+		}
+	};
+	class ForkException : public std::exception{
+	public:
+		virtual const char  *what() const throw(){
+			std::cout << std::strerror(errno) << std::endl;
+			return ("FORK ERROR");
+		}
+	};
+	class ExecveException : public std::exception{
+	public:
+		virtual const char  *what() const throw(){
+			std::cout << std::strerror(errno) << std::endl;
+			return ("EXECVE ERROR");
+		}
+	};
+	class OpenTmpFileException : public std::exception{
+	public:
+		virtual const char  *what() const throw(){
+			std::cout << std::strerror(errno) << std::endl;
+			return ("OPEN TEMPORARY FILE ERROR");
 		}
 	};
 };

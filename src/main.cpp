@@ -4,21 +4,20 @@
 
 int main(int argc, char **argv){
 	int selectResult;
-	int i = 0;
-	int j = 0;
 
 	if (argc != 2) {
-		Exceptions::WrongArgsNumException();
+		std::cerr << "WRONG NUMBER OF ARGUMENTS" << std::endl;
 		return 1;
 	}
 	ParseConfig start(argv[1]);
-    try {
+	try {
 		start.ParseConf();
 		Cluster cluster(&start);
+		std::cout << "start" << std::endl;
 		while (1) {
 			cluster.resetSockets();
 			selectResult = cluster.serversSelect();
-			std::cout << "select result :" << selectResult << std::endl;
+			//std::cout << "select result :" << selectResult << std::endl;
 			if (selectResult == -1){
 				if (errno == EINTR){
 					;//what's this1?

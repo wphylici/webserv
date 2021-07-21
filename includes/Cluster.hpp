@@ -17,6 +17,7 @@ private:
 	int							_maxFd;
 	std::vector<Server*>		_servers;
 	struct timeval				_timeout;
+	int                         _ports[100];
 
 	Cluster();
 	Cluster(const Cluster &);

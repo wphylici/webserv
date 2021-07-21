@@ -93,7 +93,6 @@ void 							Server::readFromSockets(fd_set readFds){
 	int i = 0;
 	for (std::vector<Connection*>::iterator it = _connections.begin(); it != _connections.end(); ++it) {
 		if (FD_ISSET((*it)->getSocketFd(), &readFds)) {
-			std::cout << i << "read from " << (*it)->getSocketFd() << std::endl;
 			(*it)->readFromSocket();
 		}
 		i++;
@@ -102,7 +101,6 @@ void 							Server::readFromSockets(fd_set readFds){
 void 							Server::writeToSockets(fd_set writeFds){
 	for (std::vector<Connection*>::iterator it = _connections.begin(); it != _connections.end(); ++it) {
 		if (FD_ISSET((*it)->getSocketFd(), &writeFds)) {
-			std::cout << "write to" << (*it)->getSocketFd() << std::endl;
 			(*it)->writeToSocket();
 		}
 	}
